@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="温馨提示：如果您对Echarts与React足够了解，并且想直接了当的看组件式百度图表react-component-echarts的解决方案，那么为了不浪费您宝贵的时间，建议您跳过前面的部分，直接从解决方案部分开始看起。  前言在众多数据可视化产品中，Echarts可谓中流砥柱，其功能的强大、灵活在图表界的水平以顶尖来形容，个人感觉一点也不过分；我作为一名前端开发人员，也经常用Echarts来">
+<meta name="keywords" content="React,Echarts,react-component-echarts">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【React】戏说组件式百度图表的由来及简单逻辑">
+<meta property="og:url" content="https://dawiwt.com/2019/04/29/react-component-echarts.html">
+<meta property="og:site_name" content="DaWi&#39;s blog">
+<meta property="og:description" content="温馨提示：如果您对Echarts与React足够了解，并且想直接了当的看组件式百度图表react-component-echarts的解决方案，那么为了不浪费您宝贵的时间，建议您跳过前面的部分，直接从解决方案部分开始看起。  前言在众多数据可视化产品中，Echarts可谓中流砥柱，其功能的强大、灵活在图表界的水平以顶尖来形容，个人感觉一点也不过分；我作为一名前端开发人员，也经常用Echarts来">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://static.dawiwt.com/blog/2019/04/basic-line-chart.png">
+<meta property="og:image" content="https://static.dawiwt.com/blog/2019/04/recharts-slogen.png">
+<meta property="og:image" content="https://static.dawiwt.com/blog/2019/04/recharts-tools.png">
+<meta property="og:image" content="https://static.dawiwt.com/blog/2019/04/recharts-var.png">
+<meta property="og:image" content="https://static.dawiwt.com/blog/2019/04/recharts-error.png">
+<meta property="og:updated_time" content="2019-08-08T06:28:42.951Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【React】戏说组件式百度图表的由来及简单逻辑">
+<meta name="twitter:description" content="温馨提示：如果您对Echarts与React足够了解，并且想直接了当的看组件式百度图表react-component-echarts的解决方案，那么为了不浪费您宝贵的时间，建议您跳过前面的部分，直接从解决方案部分开始看起。  前言在众多数据可视化产品中，Echarts可谓中流砥柱，其功能的强大、灵活在图表界的水平以顶尖来形容，个人感觉一点也不过分；我作为一名前端开发人员，也经常用Echarts来">
+<meta name="twitter:image" content="https://static.dawiwt.com/blog/2019/04/basic-line-chart.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://dawiwt.com/2019/04/29/react-component-echarts">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>【React】戏说组件式百度图表的由来及简单逻辑 | DaWi's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">DaWi's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">写我所想</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+  
+  
+
+  
+
+  <a href="https://github.com/dawiwt" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewbox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg></a>
+
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://dawiwt.com/2019/04/29/react-component-echarts.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="DaWi">
+      <meta itemprop="description" content="写我所想">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="DaWi's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">【React】戏说组件式百度图表的由来及简单逻辑
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-29 17:50:08" itemprop="dateCreated datePublished" datetime="2019-04-29T17:50:08+08:00">2019-04-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-08 14:28:42" itemprop="dateModified" datetime="2019-08-08T14:28:42+08:00">2019-08-08</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/04/29/react-component-echarts.html#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/04/29/react-component-echarts.html" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+            <span id="/2019/04/29/react-component-echarts.html" class="leancloud_visitors" data-flag-title="【React】戏说组件式百度图表的由来及简单逻辑">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>温馨提示：如果您对<code>Echarts</code>与<code>React</code>足够了解，并且想直接了当的看组件式百度图表<a href="https://github.com/dawiwt/react-component-echarts" target="_blank" rel="noopener"><code>react-component-echarts</code></a>的解决方案，那么为了不浪费您宝贵的时间，建议您跳过前面的部分，直接从<a href="#解决方案"><code>解决方案</code></a>部分开始看起。</p>
+</blockquote>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在众多数据可视化产品中，<code>Echarts</code>可谓中流砥柱，其功能的强大、灵活在图表界的水平以顶尖来形容，个人感觉一点也不过分；我作为一名前端开发人员，也经常用<code>Echarts</code>来解决公司或个人项目中的图表需求，甚是得心应手；不得不说，在我从事研发工作多年以来，还能保持着一头乌黑的短发，<code>Echarts</code>有一部分的功劳，我非常感谢她，帮我解决了不少烦恼。</p>
+<p>后来，我遇到了<code>React</code>，她<strong>声明式</strong>、<strong>组件化</strong>、<strong>一次学习，随处编写</strong>的三大特性一下将我拉向了一个全新的世界，恍惚间我隐约明白，原来世界还能这样运行；我不断的了解着她，每天与她促膝长谈、通力合作，完成了一个又一个项目；是时候了，该向她介绍我的另一位老朋友与她认识了；没错，就是<code>Echarts</code>，我觉得大家会很愉快的接纳对方；但，事与愿违。</p>
+<p><em>我似乎闻到了一丝火药味；是了，她们都是强者，性格各异，我作为中间人，要磨合她们。</em><br><a id="more"></a></p>
+<h2 id="Echarts"><a href="#Echarts" class="headerlink" title="Echarts"></a>Echarts</h2><p><code>Echarts</code>的工作方式十分简单，你只需要告诉她要什么图表、展示什么数据就可以了，毫秒之间，原本干枯的数据就会变成绘声绘色的可视化图表，让人有一种成就感满满的错觉，就像下面这样：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">const</span> dom = <span class="built_in">document</span>.getElementById(<span class="string">'container'</span>)</span><br><span class="line"> <span class="keyword">const</span> myChart = echarts.init(dom)</span><br><span class="line"> <span class="keyword">const</span> option = &#123;</span><br><span class="line">            xAxis: &#123;</span><br><span class="line">                type: <span class="string">'category'</span>,</span><br><span class="line">                data: [<span class="string">'Mon'</span>, <span class="string">'Tue'</span>, <span class="string">'Wed'</span>, <span class="string">'Thu'</span>, <span class="string">'Fri'</span>, <span class="string">'Sat'</span>, <span class="string">'Sun'</span>]</span><br><span class="line">            &#125;,</span><br><span class="line">            yAxis: &#123;</span><br><span class="line">                type: <span class="string">'value'</span></span><br><span class="line">            &#125;,</span><br><span class="line">            series: [&#123;</span><br><span class="line">                data: [<span class="number">820</span>, <span class="number">932</span>, <span class="number">901</span>, <span class="number">934</span>, <span class="number">1290</span>, <span class="number">1330</span>, <span class="number">1320</span>],</span><br><span class="line">                type: <span class="string">'line'</span></span><br><span class="line">            &#125;]</span><br><span class="line">        &#125;</span><br><span class="line">myChart.setOption(option, <span class="literal">true</span>)</span><br></pre></td></tr></table></figure>
+<p>如果将这段代码放在一个完整的<code>HTML</code>中，打开浏览器，你会看到一幅美丽的图表，跟下面这张图片一样，而且浏览器中还是带动画的：<br><img src="https://static.dawiwt.com/blog/2019/04/basic-line-chart.png" alt="Basic Line Chart"><br>单看一堆数字，很难看清楚他在表达什么，如果将他转换成图表，那么结果就不言而喻了，这就是类<code>Echarts</code>库的魅力所在。</p>
+<h2 id="React"><a href="#React" class="headerlink" title="React"></a>React</h2><p>在全新的世界中，我着重说一点：<strong>组件化</strong>，这是我喜欢<code>React</code>的一大原因；何为组件化？我这里做个不太恰当的比喻：零件；一个机械化的手表，里面由若干个精密的齿轮、发条完美的结合在一起，各自分工，最终都有一个共同的目标：表达时间；我们写组件，就是在做零件，可以自己做，也可以拿别人做好的；再通过自己的加工打磨，组合在一起，就完成了一个目标，最终构成一个复杂的界面；这就是我所理解的，使用<code>React</code>最基本、最主要的工作模式。</p>
+<p>一个简单的<code>React</code>组件就像这样：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 显示当前时间</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DateNow</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">        <span class="keyword">super</span>(props)</span><br><span class="line">        <span class="keyword">this</span>.state = &#123;</span><br><span class="line">            now: <span class="built_in">Date</span>.now()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    componentDidMount() &#123;</span><br><span class="line">        setInterval(<span class="function"><span class="params">()</span> =&gt;</span> <span class="keyword">this</span>.setState(&#123; <span class="attr">now</span>: <span class="built_in">Date</span>.now() &#125;), <span class="number">1000</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    render() &#123;</span><br><span class="line">        <span class="keyword">const</span> &#123; name &#125; = <span class="keyword">this</span>.props</span><br><span class="line">        <span class="keyword">const</span> &#123; now &#125; = <span class="keyword">this</span>.state</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div className=<span class="string">"date-now"</span>&gt;</span><br><span class="line">                &lt;p&gt;当前时间：&#123;<span class="built_in">Date</span>(now)&#125;&lt;<span class="regexp">/p&gt;</span></span><br><span class="line"><span class="regexp">                &lt;p&gt;你好：&#123;name&#125;&lt;/</span>p&gt;</span><br><span class="line">            &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">        )</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ 当前时间：Sun Apr 07 2019 16:30:10 GMT+0800 (中国标准时间)</span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ 你好：安妮</span></span><br><span class="line"><span class="regexp">&lt;DateNow name="安妮" /</span>&gt;</span><br></pre></td></tr></table></figure>
+<p>这样一个零件就制作好了，哪里使用安哪里。一个设计巧妙的组件，总应该尽可能的发挥它自己的作用，这才是写一个组件的意义，不过现实是，当你前期不遗余力的编写好了很多个组件，考虑了足够多的应用场景，准备在将来一展拳脚，向老板展示自己真正的实力的时候，回过头来才发现，项目…亡了，这是一个足够悲伤又透露着可笑的故事，然而这也是现实中绝大多数项目的一种情况，所以说我们在从头开始做一个项目的时候，真的要好好考虑它的实际情况，一上来就从开山掘石的起点去盖楼是极不明智的，它或许没有那么多的时间来等你做准备工作，其实拿来主义的背后透露着三个字：更可靠；公司的项目能够准时交付、业务线能稳定增长，是需要更成熟的轮子来作为铺垫的，即便你的能力再强、逻辑再缜密、造的轮子零BUG，那也是需要时间的，而往往很多项目来不及等就要黄了，更何况自己赶时间造的轮子漏洞百出；总之，我的看法就是：项目与学习要分清，项目就是要更靠谱，学习才能去造轮子，说难听点，项目不是你练手的地方。</p>
+<p>撤远了，这不是咱们现在讨论的主题，谈到组件就由感而发，还请阅者批正；不过话说回来，如果在工作之余，能够造一些基础轮子还是很有必要的，这种轮子不属于任何一类项目，只是很明确的解决一种需求或完成一个基本功能，这是一劳永逸的事情。</p>
+<p>再回到正题，咱们接下来的主题是：介绍<code>Echarts</code>与<code>React</code>成为好朋友，让她们更默契的为大家工作。</p>
+<h2 id="强行组合"><a href="#强行组合" class="headerlink" title="强行组合"></a>强行组合</h2><p>为什么说要让她们更默契呢，这里不得不将她们拉出来让大家看看，为什么我这么说：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Exmaple</span> <span class="keyword">extends</span> <span class="title">Component</span></span>&#123;</span><br><span class="line">    componentDidMount()&#123;</span><br><span class="line">        <span class="keyword">const</span> myChart = echarts.init(<span class="keyword">this</span>.chartDom)</span><br><span class="line">        <span class="keyword">const</span> option = &#123;</span><br><span class="line">                    xAxis: &#123;</span><br><span class="line">                        type: <span class="string">'category'</span>,</span><br><span class="line">                        data: [<span class="string">'Mon'</span>, <span class="string">'Tue'</span>, <span class="string">'Wed'</span>, <span class="string">'Thu'</span>, <span class="string">'Fri'</span>, <span class="string">'Sat'</span>, <span class="string">'Sun'</span>]</span><br><span class="line">                    &#125;,</span><br><span class="line">                    yAxis: &#123;</span><br><span class="line">                        type: <span class="string">'value'</span></span><br><span class="line">                    &#125;,</span><br><span class="line">                    series: [&#123;</span><br><span class="line">                        data: [<span class="number">820</span>, <span class="number">932</span>, <span class="number">901</span>, <span class="number">934</span>, <span class="number">1290</span>, <span class="number">1330</span>, <span class="number">1320</span>],</span><br><span class="line">                        type: <span class="string">'line'</span></span><br><span class="line">                    &#125;]</span><br><span class="line">                &#125;</span><br><span class="line">        myChart.setOption(option, <span class="literal">true</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    render()&#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div ref=&#123;chartDom=&gt;<span class="keyword">this</span>.chartDom=chartDom&#125;/&gt;</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样的代码是能运行，但是<code>Echart</code>与<code>React</code>基本上是自己干自己的，完全没有要相互靠拢的意思，这还怎么更好的玩耍呢？而且大段的<code>option</code>也很难维护，在实际项目中，若干个属性值还是动态数据，比如这里的<code>series[].data</code>，万一图表复杂，动态数据更多，如果页面上还有很多其它元素，那最后你就会发现自己写了一坨代码，过后自己都不想再看，更别说让别人维护了；即便把图表相关的代码拿出来另起文件，一样是各玩各的，极不和谐。</p>
+<p>有道是：<code>代码千万行，注释第一行；编码不规范，同事两行泪</code>，何解呢？</p>
+<p>遇到问题总是要解决的，即便测试的小姐姐们以容嬷嬷的步伐缓缓走来、面带蒙娜丽莎般的微笑告诉我：上线吧。但那一坨魔一样存在的代码总是时不时的在我心里冒出来嬉笑自己一番，真真的饭也不香、夜也不眠呐；想办法解决它吧，谁叫咱是有追求的人呢？</p>
+<p><em>刹那间，妖风四起，天空中滚滚乌云压将下来，我一阵翻云倒海，与那一坨魔一样的代码斗的你死我活，就在我快要支撑不住的时候，忽然感觉右肩一沉，吓的我一个机灵，然后一声低沉的声音入耳：发什么楞呢？呜呼～，原来是自己走火入魔了，不过我已经想到了解决方案。</em></p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>直观来讲，<code>Echarts</code>为配置式开发，主要维护一个<code>option</code>就可以了；<code>React</code>为组件式开发，对外可接收<code>props</code>参数，内部通过<code>state</code>控制逻辑，再加上<code>jsx</code>来编写页面结构，简直完美！那么，何不以组件式的形式来完成<code>Echarts</code>的开发？就像这样：</p>
+<p><img src="https://static.dawiwt.com/blog/2019/04/recharts-slogen.png" alt="配置式与组件式对比"></p>
+<p>单从行数上来看，已经少了很多，可维护性也更高，将一个庞大的配置对象拆分成一个个属性，开发人员只需要关心可变化的那一部分即可，或通过<code>state</code>，或通过<code>redux</code>等来存储数据，逻辑一下子清晰了很多，那种熟悉又亲切的感觉找回来了！</p>
+<p>想法是好的，如何实现呢？</p>
+<p>将配置与<code>jsx</code>仔细一对比会发现，其实它们的结构是相似的，可以说是一至的，<code>Recharts</code>可以作为<code>option</code>对象本身，那么它的子节点<code>XAxis</code>、<code>YAxis</code>、<code>Series</code>就对应着<code>option</code>对象的三个属性，而这三个属性的值在<code>jsx</code>上又以<code>props</code>的形式来体现，一一对应起来了，简单来说，代码是这样子的：<br><figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> React, &#123; PureComponent &#125; <span class="keyword">from</span> <span class="string">'react'</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">Recharts</span> <span class="keyword">extends</span> <span class="title">PureComponent</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>() &#123;</span><br><span class="line">        <span class="keyword">super</span>()</span><br><span class="line">        <span class="keyword">this</span>.option = &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    componentDidMount()&#123;</span><br><span class="line">        <span class="keyword">this</span>.chart = echarts.init(<span class="keyword">this</span>.dom, ...)</span><br><span class="line">        <span class="keyword">this</span>.chart.setOption(<span class="keyword">this</span>.option)</span><br><span class="line">    &#125;</span><br><span class="line">    render()&#123;</span><br><span class="line">        <span class="keyword">const</span> &#123;children&#125; = <span class="keyword">this</span>.props</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div ref=&#123;dom=&gt;<span class="keyword">this</span>.dom=dom&#125;&gt;&#123;children&#125;&lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">        )</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<p>这里主要做了两件事，一是保存了配置<code>option</code>对象，一是创建并初始化了图表，根节点的任务算是完成了大半了，但是这个时候<code>option</code>是个空对象，里面什么也没有，图表自然也出不来，它的数据主要来自子节点，那么子节点的任务就很明了了，将接收到的<code>props</code>原封不动向上传递，统统砸向父节点就完了。</p>
+<p>问题来了，如何向上传递？<code>React</code>的特性是自上而下，父节点想给子节点传递数据很简单，通过<code>props</code>传就可以了，但是子节点向父节点传呢？只能通过函数来传递了，我也不得不这么做：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根节点</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="class"><span class="keyword">class</span> <span class="title">Recharts</span> <span class="keyword">extends</span> <span class="title">PureComponent</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 接收子节点配置</span></span><br><span class="line">    <span class="comment">// @name 子节点名称</span></span><br><span class="line">    <span class="comment">// @option 子节点配置</span></span><br><span class="line">    handleReceiveChildOption = <span class="function">(<span class="params">name, option</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// 进一步处理</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    render()&#123;</span><br><span class="line">        <span class="keyword">return</span> (</span><br><span class="line">            &lt;div ref=&#123;dom =&gt; (<span class="keyword">this</span>.dom = dom)&#125;&gt;</span><br><span class="line">                    &#123;React.Children.map(<span class="keyword">this</span>.props.children, children =&gt; &#123;</span><br><span class="line">                        <span class="keyword">if</span> (isValidElement(children)) &#123;</span><br><span class="line">                            <span class="keyword">return</span> React.cloneElement(children, &#123;</span><br><span class="line">                                triggerPushOption: <span class="keyword">this</span>.handleReceiveChildOption</span><br><span class="line">                            &#125;)</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">return</span> children</span><br><span class="line">                    &#125;)&#125;</span><br><span class="line">                &lt;<span class="regexp">/div&gt;</span></span><br><span class="line"><span class="regexp">        )</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br><span class="line"><span class="regexp"></span></span><br><span class="line"><span class="regexp">/</span><span class="regexp">/ 子节点</span></span><br><span class="line"><span class="regexp">export default class BaseComponent extends PureComponent &#123;</span></span><br><span class="line"><span class="regexp">    componentDidMount()&#123;</span></span><br><span class="line"><span class="regexp">        const &#123; triggerPushOption, children, ...props &#125; = this.props</span></span><br><span class="line"><span class="regexp">        if(triggerPushOption) &#123;</span></span><br><span class="line"><span class="regexp">            triggerPushOption(this.name, props)</span></span><br><span class="line"><span class="regexp">        &#125;</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">    render()&#123;</span></span><br><span class="line"><span class="regexp">        return this.props.children</span></span><br><span class="line"><span class="regexp">    &#125;</span></span><br><span class="line"><span class="regexp">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>这个时候，子节点的任务基本就完成了，它只需要简单的向上传递就可以了，无需再做其它处理，其实这里子节点还需要考虑一种情况就是子节点也有子节点：<code>&lt;Toolbox&gt;&lt;Feature/&gt;&lt;/Toolbox&gt;</code>，要处理这种情况很简单，像父节点那样，给<code>children</code>传递一个函数，在函数里接收数据，合并后继续向上传递就可以了，这里不再给出代码。</p>
+<p>是不是就大功告成了？是的，主要逻辑就是这么简单，<code>Echarts</code>本身就很强大，我做的只不过是按需将<code>jsx</code>生成<code>option</code>并适时创建图表就可以了；当然，实际代码要复杂一些，因为我还考虑了子节点是数组的时候如何处理、容器改变大小时如何<code>resize</code>图表、如何合并<code>option</code>以达到减少<code>setOption</code>操作的目的等等，还有很重要的一点就是，<code>option</code>属性虽多，但做为子节点它们的行为都是一致的，我只需要将属性罗列下来，通过数组来扩展<code>BaseComponent</code>就可以了，细节逻辑也比较简单，就不在这里细说了，感兴趣的朋友可以看<a href="https://github.com/dawiwt/react-component-echarts/blob/master/src/core/recharts.js" target="_blank" rel="noopener">源码</a>。</p>
+<h2 id="辅助工具"><a href="#辅助工具" class="headerlink" title="辅助工具"></a>辅助工具</h2><p>在我丧心病狂的撸完了代码，心喜若狂的准备大干一番的时候才发现，原来我又给自己制造了一个烦恼，这话怎么说？我相信绝大多数同学在写<code>Echarts</code>图表时，一定是从官方示例中找一个跟自己需求类似的图表，将其<code>option</code>复制粘贴到自己项目中，再按需改改，一个图表的功能就完成了，快速直接，简直一个字：美！</p>
+<p>但是换成<code>jsx</code>的写法时…， WTF！我需要将一个个的属性重新写成<code>jsx</code>，然后再一个个的把属性值写成<code>props</code>，当我把一个比较复杂的图表全部改成组件式后，我的状态是：我是谁？我在哪？我在做什么？如果就此结束，那么<a href="https://github.com/dawiwt/react-component-echarts" target="_blank" rel="noopener"><code>react-component-echarts</code></a>也就没什么作用了，原因三个字：太难用。</p>
+<p><em>我没有放弃！</em></p>
+<p>伴随着愤怒的键盘敲击与<code>MacBook</code>风扇嗡嗡作响的哀嚎声中，为<a href="https://github.com/dawiwt/react-component-echarts" target="_blank" rel="noopener"><code>react-component-echarts</code></a>专门服务的<a href="https://dawiwt.github.io/react-component-echarts/tools.html" target="_blank" rel="noopener">辅助工具</a>应运而生了，它长这个丑样：</p>
+<p><img src="https://static.dawiwt.com/blog/2019/04/recharts-tools.png" alt="辅助工具"></p>
+<p>辅助工具主要由三部分组成：</p>
+<ul>
+<li>左侧：可编辑，此处粘贴自己的<code>option</code></li>
+<li>右上：不可编辑，根据左侧<code>option</code>生成所依赖的组件</li>
+<li>右下：不可编辑，根据左侧<code>option</code>生成组件式图表代码</li>
+</ul>
+<p>还有隐藏的第四部分与第五部分，一个是提示替换变量，一个是<code>option</code>代码有错误，生成代码失败时会出现，分别是：<br><img src="https://static.dawiwt.com/blog/2019/04/recharts-var.png" alt="提示替换变量"></p>
+<p><img src="https://static.dawiwt.com/blog/2019/04/recharts-error.png" alt="代码有错误"></p>
+<p>代码有错误这个就不用多解释了，检查自己的<code>option</code>有什么问题改过来就好了；提示替换变量需要说明一下，好比你从官网示例中复制了一段配置，配置里面某一项的值是取的外部变量，那么这个时候在辅助工具的运行环境是没有这个变量的，生成时就会出错，我在这里做了一个容错处理，发现有变量未定义这种错误时，会自动创建一个同名变量，并且在生成图表代码时，变量以<code>$varName$</code>的形式存在，当你发现有这个提示时，只需要把以<code>$</code>开头结尾的字符串替换为真实变量就可以了。</p>
+<p><em>从此，<code>Echarts</code>与<code>React</code>终于愉快的生活，哦不，愉快的工作在一起了。</em></p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><p>本人水平有限，文笔有限，以上文字还请海涵；另外，如果发现<a href="https://github.com/dawiwt/react-component-echarts" target="_blank" rel="noopener"><code>react-component-echarts</code></a>逻辑有什么问题或者有什么更好的建议，还请明示，非常感谢！</p>
+<p><strong>React Component Echarts 相关链接 (给个 Star 呗)：</strong></p>
+<ul>
+<li>GitHub: <a href="https://github.com/dawiwt/react-component-echarts" target="_blank" rel="noopener">https://github.com/dawiwt/react-component-echarts</a></li>
+<li>Npm: <a href="https://www.npmjs.com/package/react-component-echarts" target="_blank" rel="noopener">https://www.npmjs.com/package/react-component-echarts</a></li>
+<li>Tool: <a href="https://dawiwt.github.io/react-component-echarts/tools.html" target="_blank" rel="noopener">https://dawiwt.github.io/react-component-echarts/tools.html</a></li>
+<li>Example: <a href="https://dawiwt.github.io/react-component-echarts" target="_blank" rel="noopener">https://dawiwt.github.io/react-component-echarts</a></li>
+</ul>
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTc0NjE1MzU0MCwtNTgyNTE4MjY2LDE5Mj
+I3NTQ3NzYsMTkyMjc1NDc3NiwtMTM0NTMxMDQ4NywtMTUzMjg1
+NTM0MywtMTY0NTcxMzAzNCw1MjQzMTc3MDIsLTk2NjEyNzg4Mi
+wyMTI1NzcyODg1LC05NjQzMDY2NzIsLTM1OTQ2NTU4OV19
+-->
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+      <div>
+        
+
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>DaWi</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="https://dawiwt.com/2019/04/29/react-component-echarts.html" title="【React】戏说组件式百度图表的由来及简单逻辑">https://dawiwt.com/2019/04/29/react-component-echarts.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/React/" rel="tag"># React</a>
+          
+            <a href="/tags/Echarts/" rel="tag"># Echarts</a>
+          
+            <a href="/tags/react-component-echarts/" rel="tag"># react-component-echarts</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/11/http-knowledge-list.html" rel="next" title="HTTP 知识点总结">
+                <i class="fa fa-chevron-left"></i> HTTP 知识点总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">DaWi</p>
+              <div class="site-description motion-element" itemprop="description">写我所想</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/dawiwt" title="GitHub &rarr; https://github.com/dawiwt" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:chn.dawi@qq.com" title="E-Mail &rarr; mailto:chn.dawi@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-globe"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Echarts"><span class="nav-number">2.</span> <span class="nav-text">Echarts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#React"><span class="nav-number">3.</span> <span class="nav-text">React</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#强行组合"><span class="nav-number">4.</span> <span class="nav-text">强行组合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决方案"><span class="nav-number">5.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#辅助工具"><span class="nav-number">6.</span> <span class="nav-text">辅助工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-number">7.</span> <span class="nav-text">后记</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">DaWi</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.1.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.0"></script>
+
+  <script src="/js/motion.js?v=7.1.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.0"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.0"></script>
+<script src="/js/post-details.js?v=7.1.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: true,
+    notify: false,
+    appId: '8RNg0gpsSqH8znD1cG41FcsS-gzGzoHsz',
+    appKey: 'NmvmQPAmOTLtTrr2schyAWgz',
+    placeholder: '输入评论...',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false,
+    lang: '' || 'zh-cn'
+  });
+</script>
+
+
+
+
+  
+
+
+  
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + '8RNg0gpsSqH8znD1cG41FcsS-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': '8RNg0gpsSqH8znD1cG41FcsS-gzGzoHsz',
+                'X-LC-Key': 'NmvmQPAmOTLtTrr2schyAWgz',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
